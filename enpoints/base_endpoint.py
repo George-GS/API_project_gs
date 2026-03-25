@@ -18,11 +18,18 @@ class BaseEndpoint:
         self.headers = None
         self.id_meme = None
 
-    def check_status_code(self, status_code):
-        with allure.step(f'Проверяем, что статус код = {status_code}'):
-            assert self.response.status_code == status_code
+    @allure.step('Проверка статус кода ответа')
+    def check_status_code(self, expected_code):
+        with allure.step(f'Проверяем, что статус код = {expected_code}'):
+            actual_code = self.response.status_code
+            assert self.response.status_code == expected_code, \
+                f'Ожидался статус код {expected_code}, получен {actual_code}'
 
-    @allure.step('')
-    def check_body_response(self, body_response):
-        assert self.response.json() == body_response
+
+    @allure.step('Проверка тела ответа на соответсвие проверяемому')
+    def check_body_response(self, expected_body_response):
+        actual_body_response = self.response.json()
+        assert actual_body_response == expected_body_response, \
+            f'Ожидался овтет {expected_body_response}' \
+            f'Получен овтет {actual_body_response}'
 
