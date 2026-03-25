@@ -15,7 +15,13 @@ class BaseEndpoint:
         self.body = None
         self.response = None
         self.headers = None
+        self.id_meme = None
 
-    @allure.step('Проверяем, что статус код 200')
-    def check_status_code_200(self):
-        assert self.response.status_code == 200
+    def check_status_code(self, status_code):
+        with allure.step(f'Проверяем, что статус код = {status_code}'):
+            assert self.response.status_code == status_code
+
+    @allure.step('')
+    def check_body_response(self, body_response):
+        assert self.response.json() == body_response
+

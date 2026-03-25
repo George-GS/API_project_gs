@@ -4,8 +4,11 @@ import allure
 from enpoints.base_endpoint import BaseEndpoint
 
 
-class GetObjects(BaseEndpoint):
+class GetAllMemes(BaseEndpoint):
+    '''
 
-    def get_objects(self, headers):
+    '''
+    @allure.step('')
+    def get_all_memes(self, headers):
         self.response = requests.get(f'{self.BASE_URL}/meme', headers=headers)
         return self.response
