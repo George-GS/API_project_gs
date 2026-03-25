@@ -8,7 +8,17 @@ class GetAllMemes(BaseEndpoint):
     '''
 
     '''
-    @allure.step('')
+    @allure.step('Получение всех мемов')
     def get_all_memes(self, headers):
         self.response = requests.get(f'{self.BASE_URL}/meme', headers=headers)
+        self.json_response = self.response.json()
+        return self.response
+
+    @allure.step('Проверяем структуру ответа')
+    def check_body_all_memes(self):
+        assert isinstance(self.json_response, dict)
+        assert 'data' in self.json_response
+
+    def get_all_memes_post_method(self, headers):
+        self.response = requests.post(f'{self.BASE_URL}/meme', headers=headers)
         return self.response

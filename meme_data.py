@@ -1,6 +1,10 @@
 
 body_for_post_token = {'name': 'george_gs'}
 
+headers_bad_token = {'Authorization': 'bad_token'}
+headers_empty_token = {'Authorization': ''}
+headers_no_token = {}
+
 
 body_meme_id_1 = {
     "id": 1,

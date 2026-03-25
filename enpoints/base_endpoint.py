@@ -14,6 +14,7 @@ class BaseEndpoint:
         self.token = None
         self.body = None
         self.response = None
+        self.json_response = None
         self.headers = None
         self.id_meme = None
 
