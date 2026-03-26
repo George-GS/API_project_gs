@@ -83,6 +83,13 @@ def id_new_meme(post_meme_endpoint, delete_meme_endpoint):
     yield post_meme_endpoint.id_meme
     delete_meme_endpoint.delete_meme(post_meme_endpoint.id_meme)
 
+@pytest.fixture()
+def only_create_new_meme(post_meme_endpoint):
+    """Создает новый мем, возвращает его id, после теста удаляем этот мем"""
+    post_meme_endpoint.post_meme(meme_data.valid_body_for_post_meme)
+    yield post_meme_endpoint.id_meme
+
+
 
 @pytest.fixture()
 def put_body(put_meme_endpoint, id_new_meme):
@@ -90,6 +97,7 @@ def put_body(put_meme_endpoint, id_new_meme):
     body = meme_data.valid_body_for_put_meme.copy()
     body['id'] = id_new_meme
     return body
+
 
 
 
