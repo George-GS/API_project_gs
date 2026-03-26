@@ -11,9 +11,6 @@ from enpoints.post_meme import PostMeme
 from enpoints.put_meme import PutMeme
 from enpoints.delete_meme import DeleteMeme
 
-load_dotenv()
-token = os.getenv('TOKEN')
-
 
 @pytest.fixture()
 def post_authorize_endpoint():
@@ -57,13 +54,17 @@ def delete_meme_endpoint():
     return DeleteMeme()
 
 
+load_dotenv()
+token = os.getenv('TOKEN')
+
+
 @pytest.fixture()
 def check_and_get_token(get_authorize_token_endpoint, post_authorize_endpoint):
     """Проверяет жив ли токен, если нет - получает новый токен, возвращает живой токен"""
-    if get_authorize_token_endpoint.check_token(token).startswith('Token is alive'):
+    if get_authorize_token_endpoint.check_token(token).status_code == 200:
         return token
     else:
-        new_token = post_authorize_endpoint.user_authorization(meme_data.body_for_post_token)
+        new_token = post_authorize_endpoint.user_authorization(meme_data.valid_body_for_post_token)
         set_key('.env', 'TOKEN', new_token)
         return new_token
 

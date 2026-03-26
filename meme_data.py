@@ -1,5 +1,5 @@
 
-body_for_post_token = {'name': 'george_gs'}
+valid_body_for_post_token = {'name': 'george_gs'}
 
 headers_bad_token = {'Authorization': 'bad_token'}
 headers_empty_token = {'Authorization': ''}
