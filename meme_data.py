@@ -1,5 +1,6 @@
 
 valid_body_for_post_token = {'name': 'george_gs'}
+valid_body_for_post_token_other_user = {'name': 'ivan23123'}
 
 headers_bad_token = {'Authorization': 'bad_token'}
 headers_empty_token = {'Authorization': ''}
@@ -28,7 +29,6 @@ body_meme_id_1 = {
     "url": "https://images.theconversation.com/files/177834/original/file-20170712-14488-19lw3sc.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
 }
 
-# Валидное тело для POST
 valid_body_for_post_meme = {
     "info": {
         "colors": [
@@ -44,14 +44,12 @@ valid_body_for_post_meme = {
     "url": "https://s00.yaplakal.com/pics/pics_original/4/7/1/20258174.jpg"
 }
 
-# Тело без tags
 body_post_without_tags = {
     "info": {"colors": ["green", "blue"]},
     "text": "Seriously? Yes, seriously",
     "url": "https://s00.yaplakal.com/pics/pics_original/4/7/1/20258174.jpg"
 }
 
-# Тело без text
 body_post_without_text = {
     "info": {"colors": ["green", "blue"]},
     "tags": ["fun", "boy"],
@@ -67,16 +65,32 @@ body_post_without_url = {
 
 valid_body_for_put_meme = {
     "id": 123,
+    "info": {"colors": ["yelow", "red"]},
+    "tags": ["sad", "girl"],
+    "text": "Updated text",
+    "url": "https://new-url.com/image.jpg"
+}
+
+body_put_different_order = {
+    "url": "https://new-url.com/image.jpg",
+    "tags": ["sad", "girl"],
+    "text": "Updated text",
+    "id": 123,
+    "info": {"colors": ["yelow", "red"]}
+}
+
+body_put_without_id = {
     "info": {"colors": ["green", "blue"]},
     "tags": ["fun", "boy"],
     "text": "Updated text",
     "url": "https://new-url.com/image.jpg"
 }
 
-# Тело без id
-body_put_without_id = {
-    "info": {"colors": ["green", "blue"]},
+body_post_different_order = {
+    "url": "https://s00.yaplakal.com/pics/pics_original/4/7/1/20258174.jpg",
     "tags": ["fun", "boy"],
-    "text": "Updated text",
-    "url": "https://new-url.com/image.jpg"
+    "text": "Seriously? Yes, seriously",
+    "info": {
+        "colors": ["green", "blue"]
+    }
 }
