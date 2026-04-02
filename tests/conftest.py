@@ -67,7 +67,7 @@ def check_and_get_token(get_authorize_token_endpoint, post_authorize_endpoint):
     if get_authorize_token_endpoint.check_token(token).status_code == 200:
         return token
     else:
-        new_token = post_authorize_endpoint.user_authorization(meme_data.valid_body_for_post_token)
+        new_token = post_authorize_endpoint.get_token(meme_data.valid_body_for_post_token)
         set_key('.env', 'TOKEN', new_token)
         return new_token
 
@@ -85,7 +85,7 @@ def check_and_get_token_other_user(get_authorize_token_endpoint, post_authorize_
     if get_authorize_token_endpoint.check_token(token_other_user).status_code == 200:
         return token_other_user
     else:
-        new_token = post_authorize_endpoint.get_token(meme_data.valid_body_for_post_token_other_user)
+        new_token = post_authorize_endpoint.get_token(meme_data.valid_body_for_post_token)
         set_key('.env', 'TOKEN_OTHER_USER', new_token)
         return new_token
 
