@@ -16,16 +16,6 @@ class TestPutMeme:
         put_meme_endpoint.check_status_code(200)
         put_meme_endpoint.check_body_response(body)
 
-    @allure.title('Обновление мема с пустым массивом тегов')
-    @pytest.mark.regress
-    def test_put_meme_empty_tags(self, put_meme_endpoint, id_new_meme, api_headers):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = id_new_meme
-        body['tags'] = []
-        put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
-        put_meme_endpoint.check_status_code(200)
-        put_meme_endpoint.check_body_response(body)
-
     @allure.title('Обновление мема с разным порядком полей')
     @pytest.mark.regress
     def test_put_meme_different_order(self, put_meme_endpoint, id_new_meme, api_headers):
@@ -35,28 +25,17 @@ class TestPutMeme:
         put_meme_endpoint.check_status_code(200)
         put_meme_endpoint.check_body_response(body)
 
-    @allure.title('Обновление несуществующего мема')
+    @allure.title('Обновление мема c неверным id: {test_name}')
     @pytest.mark.regress
-    def test_put_meme_not_found(self, put_meme_endpoint, api_headers):
+    @pytest.mark.parametrize('id_values, test_name', [
+        (999999999, 'non-existent id'),
+        (0, 'id = 0'),
+        (-1, 'negative id'),
+    ])
+    def test_put_meme_invalid_id(self, put_meme_endpoint, api_headers, id_values, test_name):
         body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = 999999999
-        put_meme_endpoint.put_meme(999999999, meme_data.valid_body_for_put_meme, api_headers)
-        put_meme_endpoint.check_status_code(404)
-
-    @allure.title('Обновление мема с id = 0')
-    @pytest.mark.regress
-    def test_put_meme_id_zero(self, put_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = 0
-        put_meme_endpoint.put_meme(0, meme_data.valid_body_for_put_meme, api_headers)
-        put_meme_endpoint.check_status_code(404)
-
-    @allure.title('Обновление мема с отрицательным id')
-    @pytest.mark.regress
-    def test_put_meme_negative_id(self, put_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = -1
-        put_meme_endpoint.put_meme(-1, meme_data.valid_body_for_put_meme, api_headers)
+        body['id'] = id_values
+        put_meme_endpoint.put_meme(id_values, body, api_headers)
         put_meme_endpoint.check_status_code(404)
 
     @allure.title('Обновление мема с пустым телом')
@@ -65,66 +44,43 @@ class TestPutMeme:
         put_meme_endpoint.put_meme(id_new_meme, {}, api_headers)
         put_meme_endpoint.check_status_code(400)
 
-    @allure.title('Обновление мема без поля text')
+    @allure.title('Обновление мема без обязательного поля {deleted_field}')
     @pytest.mark.regress
-    def test_put_meme_missing_text(self, put_meme_endpoint, id_new_meme, api_headers):
+    @pytest.mark.parametrize('deleted_field', ['text', 'url', 'tags', 'info'])
+    def test_put_meme_without_required_field(self, put_meme_endpoint, id_new_meme, api_headers, deleted_field):
         body = meme_data.valid_body_for_put_meme.copy()
         body['id'] = id_new_meme
-        del body['text']
+        del body[deleted_field]
         put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
         put_meme_endpoint.check_status_code(400)
 
-    @allure.title('Обновление мема без поля url')
+    @allure.title('Обновление мема с пустыми значениями поля {field}')
     @pytest.mark.regress
-    def test_put_meme_missing_url(self, put_meme_endpoint, id_new_meme, api_headers):
+    @pytest.mark.parametrize('field, value', [
+        ('tags', []),
+        ('text', ''),
+        ('url', ''),
+    ])
+    def test_put_meme_empty_values(self, put_meme_endpoint, id_new_meme, api_headers, field, value):
         body = meme_data.valid_body_for_put_meme.copy()
         body['id'] = id_new_meme
-        del body['url']
-        put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
-        put_meme_endpoint.check_status_code(400)
-
-    @allure.title('Обновление мема без поля tags')
-    @pytest.mark.regress
-    def test_put_meme_missing_tags(self, put_meme_endpoint, id_new_meme, api_headers):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = id_new_meme
-        del body['tags']
-        put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
-        put_meme_endpoint.check_status_code(400)
-
-    @allure.title('Обновление мема без поля info')
-    @pytest.mark.regress
-    def test_put_meme_missing_info(self, put_meme_endpoint, id_new_meme, api_headers):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = id_new_meme
-        del body['info']
-        put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
-        put_meme_endpoint.check_status_code(400)
-
-    @allure.title('Обновление мема с пустым text')
-    @pytest.mark.regress
-    def test_put_meme_empty_text(self, put_meme_endpoint, id_new_meme, api_headers):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = id_new_meme
-        body['text'] = ''
+        body[field] = value
         put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
         put_meme_endpoint.check_status_code(200)
+        put_meme_endpoint.check_body_response(body)
 
-    @allure.title('Обновление мема с пустым url')
+    @allure.title('Обновление мема с неверным типом поля: {field}')
     @pytest.mark.regress
-    def test_put_meme_empty_url(self, put_meme_endpoint, id_new_meme, api_headers):
+    @pytest.mark.parametrize('field, invalid_value', [
+        ('text', 12345),
+        ('url', 12345),
+        ('tags', 'not_array'),
+        ('info', 'not_dict'),
+    ])
+    def test_put_meme_invalid_field_type(self, put_meme_endpoint, id_new_meme, api_headers, field, invalid_value):
         body = meme_data.valid_body_for_put_meme.copy()
         body['id'] = id_new_meme
-        body['url'] = ''
-        put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
-        put_meme_endpoint.check_status_code(200)
-
-    @allure.title('Обновление мема с tags не массивом')
-    @pytest.mark.regress
-    def test_put_meme_tags_not_array(self, put_meme_endpoint, id_new_meme, api_headers):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = id_new_meme
-        body['tags'] = 'not_array'
+        body[field] = invalid_value
         put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
         put_meme_endpoint.check_status_code(400)
 
@@ -137,28 +93,17 @@ class TestPutMeme:
         put_meme_endpoint.put_meme(id_new_meme, body, api_headers)
         put_meme_endpoint.check_status_code(400)
 
-    @allure.title('Обновление мема без токена')
+    @allure.title('Обновление мема с невалидной авторизацией: {test_name}')
     @pytest.mark.regress
-    def test_put_meme_unauthorized(self, put_meme_endpoint, id_new_meme):
+    @pytest.mark.parametrize('headers, test_name', [
+        ({}, 'без токена'),
+        (meme_data.headers_bad_token, 'невалидный токен'),
+        (meme_data.headers_empty_token, 'пустой токен'),
+    ])
+    def test_put_meme_unauthorized_cases(self, put_meme_endpoint, id_new_meme, headers, test_name):
         body = meme_data.valid_body_for_put_meme.copy()
         body['id'] = id_new_meme
-        put_meme_endpoint.put_meme(id_new_meme, body, {})
-        put_meme_endpoint.check_status_code(401)
-
-    @allure.title('Обновление мема с невалидным токеном')
-    @pytest.mark.regress
-    def test_put_meme_invalid_token(self, put_meme_endpoint, id_new_meme):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = id_new_meme
-        put_meme_endpoint.put_meme(id_new_meme, body, meme_data.headers_bad_token)
-        put_meme_endpoint.check_status_code(401)
-
-    @allure.title('Обновление мема с пустым токеном')
-    @pytest.mark.regress
-    def test_put_meme_empty_token(self, put_meme_endpoint, id_new_meme):
-        body = meme_data.valid_body_for_put_meme.copy()
-        body['id'] = id_new_meme
-        put_meme_endpoint.put_meme(id_new_meme, body, meme_data.headers_empty_token)
+        put_meme_endpoint.put_meme(id_new_meme, body, headers)
         put_meme_endpoint.check_status_code(401)
 
     @allure.title('Обновление мема, созданного другим пользователем')
