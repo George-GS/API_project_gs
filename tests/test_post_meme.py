@@ -15,7 +15,7 @@ class TestPostMeme:
         post_meme_endpoint.check_body_response(meme_data.valid_body_for_post_meme)
         delete_meme_endpoint.delete_meme(post_meme_endpoint.id_meme, api_headers)
 
-    @allure.title('Создание мема с разным порядком полей')
+    @allure.title('Создание мема с измененным порядком полей')
     @pytest.mark.regress
     def test_post_meme_different_order(self, post_meme_endpoint, delete_meme_endpoint, api_headers):
         post_meme_endpoint.post_meme(meme_data.body_post_different_order, api_headers)
@@ -23,21 +23,17 @@ class TestPostMeme:
         post_meme_endpoint.check_body_response(meme_data.valid_body_for_post_meme)
         delete_meme_endpoint.delete_meme(post_meme_endpoint.id_meme, api_headers)
 
-    @allure.title('Создание мема с пустым массивом тегов')
+    @allure.title('Создание мема с пустым начением поля {field}')
     @pytest.mark.regress
-    def test_post_meme_empty_tags(self, post_meme_endpoint, delete_meme_endpoint, api_headers):
+    @pytest.mark.parametrize('field, value', [
+        ('tags', []),
+        ('info', {}),
+        ('text', ''),
+        ('url', '')
+    ])
+    def test_post_meme_empty_values(self, post_meme_endpoint, delete_meme_endpoint, api_headers, field, value):
         body = meme_data.valid_body_for_post_meme.copy()
-        body['tags'] = []
-        post_meme_endpoint.post_meme(body, api_headers)
-        post_meme_endpoint.check_status_code(200)
-        post_meme_endpoint.check_body_response(body)
-        delete_meme_endpoint.delete_meme(post_meme_endpoint.id_meme, api_headers)
-
-    @allure.title('Создание мема с пустым объектом info')
-    @pytest.mark.regress
-    def test_post_meme_empty_info(self, post_meme_endpoint, delete_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_post_meme.copy()
-        body['info'] = {}
+        body[field] = value
         post_meme_endpoint.post_meme(body, api_headers)
         post_meme_endpoint.check_status_code(200)
         post_meme_endpoint.check_body_response(body)
@@ -50,59 +46,26 @@ class TestPostMeme:
         post_meme_endpoint.post_meme(body, api_headers)
         post_meme_endpoint.check_status_code(400)
 
-    @allure.title('Создание мема без поля text')
+    @allure.title('Создание мема без обязательного поля {deleted_field}')
     @pytest.mark.regress
-    def test_post_meme_without_text(self, post_meme_endpoint, api_headers):
+    @pytest.mark.parametrize('deleted_field', ['text', 'url', 'tags', 'info'])
+    def test_post_meme_without_required_field(self, post_meme_endpoint, api_headers, deleted_field):
         body = meme_data.valid_body_for_post_meme.copy()
-        del body['text']
+        del body[deleted_field]
         post_meme_endpoint.post_meme(body, api_headers)
         post_meme_endpoint.check_status_code(400)
 
-    @allure.title('Создание мема без поля url')
+    @allure.title('Создание мема с неверным типом поля: {field_name}')
     @pytest.mark.regress
-    def test_post_meme_without_url(self, post_meme_endpoint, api_headers):
+    @pytest.mark.parametrize('field, invalid_value', [
+        ('text', 12345),
+        ('url', 12345),
+        ('tags', 'not_array'),
+        ('info', 'not_dict'),
+    ])
+    def test_post_meme_invalid_field_type(self, post_meme_endpoint, api_headers, field, invalid_value):
         body = meme_data.valid_body_for_post_meme.copy()
-        del body['url']
-        post_meme_endpoint.post_meme(body, api_headers)
-        post_meme_endpoint.check_status_code(400)
-
-    @allure.title('Создание мема без поля tags')
-    @pytest.mark.regress
-    def test_post_meme_without_tags(self, post_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_post_meme.copy()
-        del body['tags']
-        post_meme_endpoint.post_meme(body, api_headers)
-        post_meme_endpoint.check_status_code(400)
-
-    @allure.title('Создание мема без поля info')
-    @pytest.mark.regress
-    def test_post_meme_missing_info(self, post_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_post_meme.copy()
-        del body['info']
-        post_meme_endpoint.post_meme(body, api_headers)
-        post_meme_endpoint.check_status_code(400)
-
-    @allure.title('Создание мема с пустым text')
-    @pytest.mark.regress
-    def test_post_meme_empty_text(self, post_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_post_meme.copy()
-        body['text'] = ''
-        post_meme_endpoint.post_meme(body, api_headers)
-        post_meme_endpoint.check_status_code(400)
-
-    @allure.title('Создание мема с пустым url')
-    @pytest.mark.regress
-    def test_post_meme_empty_url(self, post_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_post_meme.copy()
-        body['url'] = ''
-        post_meme_endpoint.post_meme(body, api_headers)
-        post_meme_endpoint.check_status_code(400)
-
-    @allure.title('Создание мема с tags не массивом, а строкой')
-    @pytest.mark.regress
-    def test_post_meme_tags_not_array(self, post_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_post_meme.copy()
-        body['tags'] = 'fun'
+        body[field] = invalid_value
         post_meme_endpoint.post_meme(body, api_headers)
         post_meme_endpoint.check_status_code(400)
 
@@ -114,30 +77,15 @@ class TestPostMeme:
         post_meme_endpoint.post_meme(body, api_headers)
         post_meme_endpoint.check_status_code(400)
 
-    @allure.title('Создание мема с text не строкой')
+    @allure.title('Создание мема с невалидной авторизацией: {test_name}')
     @pytest.mark.regress
-    def test_post_meme_text_not_string(self, post_meme_endpoint, api_headers):
-        body = meme_data.valid_body_for_post_meme.copy()
-        body['text'] = 12345
-        post_meme_endpoint.post_meme(body, api_headers)
-        post_meme_endpoint.check_status_code(400)
-
-    @allure.title('Создание мема без токена')
-    @pytest.mark.regress
-    def test_post_meme_unauthorized(self, post_meme_endpoint):
-        post_meme_endpoint.post_meme(meme_data.valid_body_for_post_meme, meme_data.headers_no_token)
-        post_meme_endpoint.check_status_code(401)
-
-    @allure.title('Создание мема с невалидным токеном')
-    @pytest.mark.regress
-    def test_post_meme_with_bad_token(self, post_meme_endpoint):
-        post_meme_endpoint.post_meme(meme_data.valid_body_for_post_meme, meme_data.headers_bad_token)
-        post_meme_endpoint.check_status_code(401)
-
-    @allure.title('Создание мема с пустым токеном')
-    @pytest.mark.regress
-    def test_post_meme_with_empty_token(self, post_meme_endpoint):
-        post_meme_endpoint.post_meme(meme_data.valid_body_for_post_meme, meme_data.headers_empty_token)
+    @pytest.mark.parametrize('headers, test_name', [
+        (meme_data.headers_no_token, 'no_token'),
+        (meme_data.headers_bad_token, 'bad_token'),
+        (meme_data.headers_empty_token, 'empty_token'),
+    ])
+    def test_post_meme_unauthorized_cases(self, post_meme_endpoint, headers, test_name):
+        post_meme_endpoint.post_meme(meme_data.valid_body_for_post_meme, headers)
         post_meme_endpoint.check_status_code(401)
 
     @allure.title('Создание мема через GET метод')

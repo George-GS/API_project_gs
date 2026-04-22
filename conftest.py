@@ -1,6 +1,7 @@
 import pytest
 from dotenv import load_dotenv, set_key
 import os
+from pathlib import Path
 import random
 import string
 
@@ -55,8 +56,9 @@ def delete_meme_endpoint():
     '''Возвращает экземпляр класса DeleteMeme'''
     return DeleteMeme()
 
-
-load_dotenv()
+BASE_DIR = Path(__file__).parent  # это папка API_project_gs
+ENV_PATH = BASE_DIR / '.env'
+load_dotenv(ENV_PATH)
 token = os.getenv('TOKEN')
 token_other_user = os.getenv('TOKEN_OTHER_USER')
 
@@ -68,7 +70,7 @@ def check_and_get_token(get_authorize_token_endpoint, post_authorize_endpoint):
         return token
     else:
         new_token = post_authorize_endpoint.get_token(meme_data.valid_body_for_post_token)
-        set_key('tests/.env', 'TOKEN', new_token)
+        set_key(str(ENV_PATH), 'TOKEN', new_token)
         return new_token
 
 
@@ -86,7 +88,7 @@ def check_and_get_token_other_user(get_authorize_token_endpoint, post_authorize_
         return token_other_user
     else:
         new_token = post_authorize_endpoint.get_token(meme_data.valid_body_for_post_token)
-        set_key('tests/.env', 'TOKEN_OTHER_USER', new_token)
+        set_key(str(ENV_PATH), 'TOKEN_OTHER_USER', new_token)
         return new_token
 
 

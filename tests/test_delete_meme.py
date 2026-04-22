@@ -25,52 +25,22 @@ class TestDeleteMeme:
         delete_meme_endpoint.delete_meme(only_create_new_meme, api_headers)
         delete_meme_endpoint.check_status_code(404)
 
-    @allure.title('Удаление мема с несуществующим id')
+    @allure.title('Попытка удаления мема с невалидным id')
     @pytest.mark.regress
-    def test_delete_meme_not_found(self, delete_meme_endpoint, api_headers):
-        delete_meme_endpoint.delete_meme(999999999, api_headers)
+    @pytest.mark.parametrize('invalid_id', [999999999, 0, -1, '', 'ид', None])
+    def test_delete_meme_invalid_id(self, delete_meme_endpoint, api_headers, invalid_id):
+        delete_meme_endpoint.delete_meme(invalid_id, api_headers)
         delete_meme_endpoint.check_status_code(404)
 
-    @allure.title('Удаление мема с id = 0')
+    @allure.title('Попытка удаления мема с невалидной авторизацией: {test_name}')
     @pytest.mark.regress
-    def test_delete_meme_id_zero(self, delete_meme_endpoint, api_headers):
-        delete_meme_endpoint.delete_meme(0, api_headers)
-        delete_meme_endpoint.check_status_code(404)
-
-    @allure.title('Удаление мема с отрицательным id')
-    @pytest.mark.regress
-    def test_delete_meme_negative_id(self, delete_meme_endpoint, api_headers):
-        delete_meme_endpoint.delete_meme(-1, api_headers)
-        delete_meme_endpoint.check_status_code(404)
-
-    @allure.title('Удаление мема с пустым id')
-    @pytest.mark.regress
-    def test_delete_meme_empty_id(self, delete_meme_endpoint, api_headers):
-        delete_meme_endpoint.delete_meme('', api_headers)
-        delete_meme_endpoint.check_status_code(404)
-
-    @allure.title('Удаление мема со строковым id')
-    @pytest.mark.regress
-    def test_delete_meme_string_id(self, delete_meme_endpoint, api_headers):
-        delete_meme_endpoint.delete_meme('abc', api_headers)
-        delete_meme_endpoint.check_status_code(404)
-
-    @allure.title('Удаление мема без токена')
-    @pytest.mark.regress
-    def test_delete_meme_unauthorized(self, delete_meme_endpoint, id_new_meme):
-        delete_meme_endpoint.delete_meme(id_new_meme, meme_data.headers_no_token)
-        delete_meme_endpoint.check_status_code(401)
-
-    @allure.title('Удаление мема с невалидным токеном')
-    @pytest.mark.regress
-    def test_delete_meme_invalid_token(self, delete_meme_endpoint, id_new_meme):
-        delete_meme_endpoint.delete_meme(id_new_meme, meme_data.headers_bad_token)
-        delete_meme_endpoint.check_status_code(401)
-
-    @allure.title('Удаление мема с пустым токеном')
-    @pytest.mark.regress
-    def test_delete_meme_empty_token(self, delete_meme_endpoint, id_new_meme):
-        delete_meme_endpoint.delete_meme(id_new_meme, meme_data.headers_empty_token)
+    @pytest.mark.parametrize('headers, test_name', [
+        (meme_data.headers_no_token, 'no_token'),
+        (meme_data.headers_bad_token, 'bad_token'),
+        (meme_data.headers_empty_token, 'empty_token'),
+    ])
+    def test_delete_meme_invalid_auth(self, delete_meme_endpoint, id_new_meme, headers, test_name):
+        delete_meme_endpoint.delete_meme(id_new_meme, headers)
         delete_meme_endpoint.check_status_code(401)
 
     @allure.title('Удаление мема, созданного другим пользователем')
