@@ -7,26 +7,15 @@ class TestPostAuthorize:
 
     @allure.title("Успешная авторизация с валидным данными")
     @pytest.mark.smoke
-    def test_success_auth_with_valid_data(self, post_authorize_endpoint):
-        body = {'name': 'george_gs'}
+    @pytest.mark.parametrize('body, test_name', [
+        ({'name': 'george_gs'}, 'valid_name'),
+        ({'name': 'george_gs'}, 'repeat_auth_same_name'),
+        ({'name': 'name name name name name name name name name name name name'}, 'long_name'),
+    ])
+    def test_auth_success(self, post_authorize_endpoint, body, test_name):
         post_authorize_endpoint.get_token(body)
         post_authorize_endpoint.check_status_code(200)
         post_authorize_endpoint.check_response_with_token()
-
-    @allure.title("Повторная авторизация с тем же name")
-    @pytest.mark.regress
-    def test_repeat_auth_same_name(self, post_authorize_endpoint):
-        body = {'name': 'george_gs'}
-        post_authorize_endpoint.get_token(body)
-        post_authorize_endpoint.check_status_code(200)
-        post_authorize_endpoint.check_response_with_token()
-
-    @allure.title("Авторизация с длинным name")
-    @pytest.mark.regress
-    def test_auth_with_long_name(self, post_authorize_endpoint):
-        body = {'name': 'name name name name name name name name name name name name'}
-        post_authorize_endpoint.get_token(body)
-        post_authorize_endpoint.check_status_code(200)
 
     @allure.title("Авторизация с пустым телом")
     @pytest.mark.regress

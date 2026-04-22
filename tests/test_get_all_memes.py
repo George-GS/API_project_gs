@@ -14,22 +14,15 @@ class TestGetAllMemes:
         get_all_memes_endpoint.check_status_code(200)
         get_all_memes_endpoint.check_body_all_memes()
 
-    @allure.title('Получение всех мемов без авторизации')
+    @allure.title('Попытка получения всех мемов с невалидной авторизацией: {test_name}')
     @pytest.mark.regress
-    def test_get_all_memes_unauthorized(self, get_all_memes_endpoint):
-        get_all_memes_endpoint.get_all_memes(meme_data.headers_no_token)
-        get_all_memes_endpoint.check_status_code(401)
-
-    @allure.title('Получение всех мемов c невалидным токеном')
-    @pytest.mark.regress
-    def test_get_all_memes_with_bad_token(self, get_all_memes_endpoint):
-        get_all_memes_endpoint.get_all_memes(meme_data.headers_bad_token)
-        get_all_memes_endpoint.check_status_code(401)
-
-    @allure.title('Получение всех мемов c пустым токеном')
-    @pytest.mark.regress
-    def test_get_all_memes_with_empty_token(self, get_all_memes_endpoint):
-        get_all_memes_endpoint.get_all_memes(meme_data.headers_empty_token)
+    @pytest.mark.parametrize('headers, test_name', [
+        (meme_data.headers_no_token, 'no_token'),
+        (meme_data.headers_bad_token, 'bad_token'),
+        (meme_data.headers_empty_token, 'empty_token'),
+    ])
+    def test_get_all_memes_invalid_auth(self, get_all_memes_endpoint, headers, test_name):
+        get_all_memes_endpoint.get_all_memes(headers)
         get_all_memes_endpoint.check_status_code(401)
 
     @allure.title('Получение списка мемов через POST метод')
