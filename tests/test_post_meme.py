@@ -55,7 +55,7 @@ class TestPostMeme:
         post_meme_endpoint.post_meme(body, api_headers)
         post_meme_endpoint.check_status_code(400)
 
-    @allure.title('Создание мема с неверным типом поля: {field_name}')
+    @allure.title('Создание мема с неверным типом поля: {field}')
     @pytest.mark.regress
     @pytest.mark.parametrize('field, invalid_value', [
         ('text', 12345),
